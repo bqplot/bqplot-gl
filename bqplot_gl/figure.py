@@ -14,7 +14,7 @@ from ._frontend import module_name, module_version
 class FigureGL(Figure):
     """TODO: Add docstring here
     """
-    _view_name = Unicode('FigureGL').tag(sync=True)
+    _view_name = Unicode('FigureGLView').tag(sync=True)
     _model_name = Unicode('FigureGLModel').tag(sync=True)
     _view_module = Unicode(module_name).tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
