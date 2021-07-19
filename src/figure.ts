@@ -7,9 +7,6 @@ import {
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
-// Import the CSS
-import '../css/widget.css';
-
 
 export class FigureGLModel extends FigureModel {
   defaults() {
@@ -33,6 +30,7 @@ export class FigureGLModel extends FigureModel {
 }
 
 
+// TODO Remove webgl stuffs from the Figure class and move them here
 export class FigureGLView extends Figure {
   // render() {
   //   super.render();
