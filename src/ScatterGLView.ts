@@ -23,6 +23,7 @@ import * as d3 from 'd3';
 import * as _ from 'underscore';
 import { ScatterGLModel } from './ScatterGLModel';
 import * as THREE from 'three';
+import { FigureGLView } from './figure';
 
 type TypedArray =
   | Int8Array
@@ -1318,4 +1319,6 @@ export class ScatterGLView extends Mark {
   dot: any;
 
   model: ScatterGLModel;
+
+  parent: FigureGLView;
 }
