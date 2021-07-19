@@ -12,7 +12,8 @@
     "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
+    // TODO Turn this to true
+    "strict": false,
     "strictPropertyInitialization": false,
     "target": "es2015"
   },
