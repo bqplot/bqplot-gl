@@ -96,8 +96,8 @@ export class FigureGLView extends Figure {
     }
   }
 
-  relayout() {
-    super.relayout();
+  relayoutImpl() {
+    super.relayoutImpl();
 
     this.layout_webgl_canvas();
   }
