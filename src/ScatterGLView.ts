@@ -174,7 +174,7 @@ export class ScatterGLView extends Mark {
     this.instanced_geometry.index = new THREE.Uint16BufferAttribute(indices, 1);
 
     // Create material for markers
-    this.scatter_material = new THREE.RawShaderMaterial({
+    this.material = new THREE.RawShaderMaterial({
       uniforms: {
         domain_x: { type: '2f', value: [0, 10] },
         domain_y: { type: '2f', value: [-12, 12] },
@@ -255,7 +255,7 @@ export class ScatterGLView extends Mark {
     });
 
     // Create mesh
-    this.mesh = new THREE.Mesh(this.instanced_geometry, this.scatter_material);
+    this.mesh = new THREE.Mesh(this.instanced_geometry, this.material);
 
     await base_render_promise;
 
@@ -278,7 +278,7 @@ export class ScatterGLView extends Mark {
 
     const color_parameters = this.get_color_attribute_parameters();
     this.color = this.initialize_attribute('color', color_parameters);
-    this.scatter_material.defines['USE_COLORMAP'] =
+    this.material.defines['USE_COLORMAP'] =
       color_parameters.use_colormap;
 
     const opacity_parameters = this.get_opacity_attribute_parameters();
@@ -304,10 +304,10 @@ export class ScatterGLView extends Mark {
 
     const selected_parameters = this.get_selected_attribute_parameters();
     this.selected = this.initialize_attribute('selected', selected_parameters);
-    this.scatter_material.uniforms['has_selection'].value =
+    this.material.uniforms['has_selection'].value =
       selected_parameters.use_selection;
 
-    this.scatter_material.needsUpdate = true;
+    this.material.needsUpdate = true;
 
     this.scene.add(this.mesh);
 
@@ -506,31 +506,31 @@ export class ScatterGLView extends Mark {
 
     _.each(['selected', 'hovered'], (style_type) => {
       _.each(['stroke', 'fill', 'opacity'], (style_property) => {
-        this.scatter_material.uniforms[
+        this.material.uniforms[
           `has_${style_type}_${style_property}`
         ].value = Boolean(
           this.model.get(`${style_type}_style`)[style_property]
         );
-        this.scatter_material.uniforms[
+        this.material.uniforms[
           `has_un${style_type}_${style_property}`
         ].value = Boolean(
           this.model.get(`un${style_type}_style`)[style_property]
         );
         if (_.contains(['opacity'], style_property)) {
-          this.scatter_material.uniforms[
+          this.material.uniforms[
             `${style_type}_${style_property}`
           ].value = this.model.get(`${style_type}_style`)[style_property];
-          this.scatter_material.uniforms[
+          this.material.uniforms[
             `un${style_type}_${style_property}`
           ].value = this.model.get(`un${style_type}_style`)[style_property];
         } else {
-          this.scatter_material.uniforms[
+          this.material.uniforms[
             `${style_type}_${style_property}`
           ].value = color_to_array_rgba(
             this.model.get(`${style_type}_style`)[style_property],
             'green'
           );
-          this.scatter_material.uniforms[
+          this.material.uniforms[
             `un${style_type}_${style_property}`
           ].value = color_to_array_rgba(
             this.model.get(`un${style_type}_style`)[style_property],
@@ -540,33 +540,33 @@ export class ScatterGLView extends Mark {
       });
     });
 
-    this.scatter_material.uniforms['range_x'].value = range_x;
-    this.scatter_material.uniforms['range_y'].value = [range_y[1], range_y[0]]; // flipped coordinates in WebGL
-    this.scatter_material.uniforms['domain_x'].value = x_scale.scale.domain();
-    this.scatter_material.uniforms['domain_y'].value = y_scale.scale.domain();
+    this.material.uniforms['range_x'].value = range_x;
+    this.material.uniforms['range_y'].value = [range_y[1], range_y[0]]; // flipped coordinates in WebGL
+    this.material.uniforms['domain_x'].value = x_scale.scale.domain();
+    this.material.uniforms['domain_y'].value = y_scale.scale.domain();
 
     if (this.scales.size) {
-      this.scatter_material.uniforms['range_size'].value =
+      this.material.uniforms['range_size'].value =
         this.scales.size.scale.range();
-      this.scatter_material.uniforms['domain_size'].value =
+      this.material.uniforms['domain_size'].value =
         this.scales.size.scale.domain();
     } else {
       const size = this.model.get('default_size');
-      this.scatter_material.uniforms['range_size'].value = [0, size];
-      this.scatter_material.uniforms['domain_size'].value = [0, size];
+      this.material.uniforms['range_size'].value = [0, size];
+      this.material.uniforms['domain_size'].value = [0, size];
     }
 
     if (this.scales.rotation) {
-      this.scatter_material.uniforms['range_rotation'].value =
+      this.material.uniforms['range_rotation'].value =
         this.scales.rotation.scale.range();
-      this.scatter_material.uniforms['domain_rotation'].value =
+      this.material.uniforms['domain_rotation'].value =
         this.scales.rotation.scale.domain();
     }
 
     if (this.scales.opacity) {
-      this.scatter_material.uniforms['range_opacity'].value =
+      this.material.uniforms['range_opacity'].value =
         this.scales.opacity.scale.range();
-      this.scatter_material.uniforms['domain_opacity'].value =
+      this.material.uniforms['domain_opacity'].value =
         this.scales.opacity.scale.domain();
     }
 
@@ -627,8 +627,8 @@ export class ScatterGLView extends Mark {
     sync_visible();
 
     const sync_fill = () => {
-      this.scatter_material.defines['FILL'] = this.model.get('fill') ? 1 : 0;
-      this.scatter_material.needsUpdate = true;
+      this.material.defines['FILL'] = this.model.get('fill') ? 1 : 0;
+      this.material.needsUpdate = true;
       this.update_scene();
     };
     this.listenTo(this.model, 'change:fill', sync_fill);
@@ -731,9 +731,9 @@ export class ScatterGLView extends Mark {
   }
 
   animate_attribute(name: string, after_animation: Function = () => {}) {
-    this.scatter_material.uniforms['animation_time_' + name]['value'] = 0;
+    this.material.uniforms['animation_time_' + name]['value'] = 0;
     const set = (value) => {
-      this.scatter_material.uniforms['animation_time_' + name]['value'] = value;
+      this.material.uniforms['animation_time_' + name]['value'] = value;
     };
     this.transition(set, after_animation, this);
   }
@@ -806,10 +806,10 @@ export class ScatterGLView extends Mark {
     const color_parameters = this.get_color_attribute_parameters();
     this.color = this.update_attribute('color', this.color, color_parameters);
     this.color.normalized = color_parameters.normalized;
-    this.scatter_material.defines['USE_COLORMAP'] =
+    this.material.defines['USE_COLORMAP'] =
       color_parameters.use_colormap;
 
-    this.scatter_material.needsUpdate = true;
+    this.material.needsUpdate = true;
 
     if (rerender) {
       this.update_scene();
@@ -865,7 +865,7 @@ export class ScatterGLView extends Mark {
       this.selected,
       selected_parameters
     );
-    this.scatter_material.uniforms['has_selection'].value =
+    this.material.uniforms['has_selection'].value =
       selected_parameters.use_selection;
 
     if (rerender) {
@@ -886,33 +886,33 @@ export class ScatterGLView extends Mark {
 
     if (marker === 'circle') {
       // same as in ./Markers.js
-      this.scatter_material.uniforms.marker_scale.value =
+      this.material.uniforms.marker_scale.value =
         1 / Math.sqrt(Math.PI);
-      this.scatter_material.defines['FAST_DRAW'] = FAST_CIRCLE;
+      this.material.defines['FAST_DRAW'] = FAST_CIRCLE;
     }
     if (marker === 'square') {
-      this.scatter_material.uniforms.marker_scale.value = 1 / 2;
-      this.scatter_material.defines['FAST_DRAW'] = FAST_SQUARE;
+      this.material.uniforms.marker_scale.value = 1 / 2;
+      this.material.defines['FAST_DRAW'] = FAST_SQUARE;
     }
     if (marker === 'arrow') {
-      this.scatter_material.uniforms.marker_scale.value = 2;
-      this.scatter_material.defines['FAST_DRAW'] = FAST_ARROW;
+      this.material.uniforms.marker_scale.value = 2;
+      this.material.defines['FAST_DRAW'] = FAST_ARROW;
     }
     if (marker === 'cross') {
-      this.scatter_material.uniforms.marker_scale.value =
+      this.material.uniforms.marker_scale.value =
         3 / (2 * Math.sqrt(5));
-      this.scatter_material.defines['FAST_DRAW'] = FAST_CROSS;
+      this.material.defines['FAST_DRAW'] = FAST_CROSS;
     }
     if (marker === 'triangle-up') {
-      this.scatter_material.uniforms.marker_scale.value = 2;
-      this.scatter_material.defines['FAST_DRAW'] = FAST_TRIANGLE_UP;
+      this.material.uniforms.marker_scale.value = 2;
+      this.material.defines['FAST_DRAW'] = FAST_TRIANGLE_UP;
     }
     if (marker === 'triangle-down') {
-      this.scatter_material.uniforms.marker_scale.value = 2;
-      this.scatter_material.defines['FAST_DRAW'] = FAST_TRIANGLE_DOWN;
+      this.material.uniforms.marker_scale.value = 2;
+      this.material.defines['FAST_DRAW'] = FAST_TRIANGLE_DOWN;
     }
 
-    this.scatter_material.needsUpdate = true;
+    this.material.needsUpdate = true;
     this.update_scene();
   }
 
@@ -920,25 +920,25 @@ export class ScatterGLView extends Mark {
     const stroke = this.model.get('stroke');
 
     if (stroke) {
-      this.scatter_material.uniforms.default_stroke_color.value =
+      this.material.uniforms.default_stroke_color.value =
         color_to_array_rgba(stroke);
-      this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = true;
+      this.material.defines['HAS_DEFAULT_STROKE_COLOR'] = true;
     } else {
-      this.scatter_material.defines['HAS_DEFAULT_STROKE_COLOR'] = false;
+      this.material.defines['HAS_DEFAULT_STROKE_COLOR'] = false;
     }
 
-    this.scatter_material.needsUpdate = true;
+    this.material.needsUpdate = true;
     this.update_scene();
   }
 
   update_stroke_width() {
-    this.scatter_material.uniforms.stroke_width.value =
+    this.material.uniforms.stroke_width.value =
       this.model.get('stroke_width');
     this.update_scene();
   }
 
   update_color_map() {
-    this.scatter_material.uniforms['colormap'].value = create_colormap(
+    this.material.uniforms['colormap'].value = create_colormap(
       this.scales.color
     );
 
@@ -957,13 +957,13 @@ export class ScatterGLView extends Mark {
         } else {
           max = Math.max(...color);
         }
-        this.scatter_material.uniforms['domain_color'].value = [min, max];
+        this.material.uniforms['domain_color'].value = [min, max];
       } else {
         if (
           this.scales.color.model.min !== null &&
           this.scales.color.model.max !== null
         ) {
-          this.scatter_material.uniforms['domain_color'].value = [
+          this.material.uniforms['domain_color'].value = [
             this.scales.color.model.min,
             this.scales.color.model.max,
           ];
@@ -1274,7 +1274,7 @@ export class ScatterGLView extends Mark {
   invalidated_pixel_position: boolean;
   scene: THREE.Scene;
   instanced_geometry: THREE.InstancedBufferGeometry;
-  scatter_material: THREE.RawShaderMaterial;
+  material: THREE.RawShaderMaterial;
   mesh: THREE.Mesh;
 
   markers_number: number;
