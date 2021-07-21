@@ -51,6 +51,16 @@ export class FigureGLView extends Figure {
       this.renderer.setPixelRatio(
         this.model.get('pixel_ratio') || window.devicePixelRatio
       );
+
+      this.camera = new THREE.OrthographicCamera(
+        -1 / 2,
+        1 / 2,
+        1 / 2,
+        -1 / 2,
+        -10000,
+        10000
+      );
+      this.camera.position.z = 10;
     }
 
     if (this.renderer && !this.el.contains(this.renderer.domElement)) {
@@ -81,6 +91,12 @@ export class FigureGLView extends Figure {
     if (!this.renderer) {
       return Promise.resolve();
     }
+
+    this.camera.left = 0;
+    this.camera.right = this.plotarea_width;
+    this.camera.bottom = 0;
+    this.camera.top = this.plotarea_height;
+    this.camera.updateProjectionMatrix();
 
     const views = await Promise.all(this.mark_views.views);
 
@@ -146,5 +162,8 @@ export class FigureGLView extends Figure {
   }
 
   private _update_requested: boolean;
+
   renderer: THREE.WebGLRenderer | null;
+
+  camera: THREE.OrthographicCamera;
 }

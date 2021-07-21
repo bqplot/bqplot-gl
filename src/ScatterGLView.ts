@@ -259,15 +259,6 @@ export class ScatterGLView extends Mark {
 
     await base_render_promise;
 
-    this.camera = new THREE.OrthographicCamera(
-      -1 / 2,
-      1 / 2,
-      1 / 2,
-      -1 / 2,
-      -10000,
-      10000
-    );
-    this.camera.position.z = 10;
     this.scene = new THREE.Scene();
 
     const x_parameters = new AttributeParameters(
@@ -549,12 +540,6 @@ export class ScatterGLView extends Mark {
       });
     });
 
-    this.camera.left = 0;
-    this.camera.right = fig.plotarea_width;
-    this.camera.bottom = 0;
-    this.camera.top = fig.plotarea_height;
-    this.camera.updateProjectionMatrix();
-
     this.scatter_material.uniforms['range_x'].value = range_x;
     this.scatter_material.uniforms['range_y'].value = [range_y[1], range_y[0]]; // flipped coordinates in WebGL
     this.scatter_material.uniforms['domain_x'].value = x_scale.scale.domain();
@@ -585,8 +570,7 @@ export class ScatterGLView extends Mark {
         this.scales.opacity.scale.domain();
     }
 
-    const renderer = fig.renderer;
-    renderer.render(this.scene, this.camera);
+    fig.renderer.render(this.scene, fig.camera);
 
     const transitions_todo = [];
     for (let i = 0; i < this.transitions.length; i++) {
@@ -1288,7 +1272,6 @@ export class ScatterGLView extends Mark {
   pixel_y: Float64Array;
   trottled_selector_changed: any;
   invalidated_pixel_position: boolean;
-  camera: THREE.OrthographicCamera;
   scene: THREE.Scene;
   instanced_geometry: THREE.InstancedBufferGeometry;
   scatter_material: THREE.RawShaderMaterial;
