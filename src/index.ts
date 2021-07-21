@@ -5,3 +5,5 @@ export * from './version';
 export * from './figure';
 export * from './ScatterGLView';
 export * from './ScatterGLModel';
+export * from './LinesGLView';
+export * from './LinesGLModel';

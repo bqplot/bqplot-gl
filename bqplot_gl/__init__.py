@@ -5,7 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from .figure import FigureGL
-from .marks import ScatterGL
+from .marks import *
 from ._version import __version__, version_info
 
 
