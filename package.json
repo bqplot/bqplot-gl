@@ -50,8 +50,10 @@
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10 || ^2.0.0 || ^3.0.0 || ^4.0.0",
     "bqplot": "^0.5.31",
+    "bqscales": "^0.2.2",
     "d3": "^5.7.0",
     "is-typedarray": "^1.0.0",
+    "lodash": "^4.17.21",
     "three": "^0.91.0"
   },
   "devDependencies": {
@@ -92,6 +94,10 @@
         "singleton": true
       },
       "bqplot": {
+        "bundled": false,
+        "singleton": true
+      },
+      "bqscales": {
         "bundled": false,
         "singleton": true
       }

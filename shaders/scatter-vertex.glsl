@@ -48,16 +48,10 @@ uniform vec4 unhovered_stroke;
 uniform bool has_unhovered_opacity;
 uniform float unhovered_opacity;
 
-uniform vec2 domain_x;
-uniform vec2 domain_y;
-uniform vec2 domain_z;
 uniform vec2 domain_size;
 uniform vec2 domain_rotation;
 uniform vec2 domain_opacity;
 
-uniform vec2 range_x;
-uniform vec2 range_y;
-uniform vec2 range_z;
 uniform vec2 range_size;
 uniform vec2 range_rotation;
 uniform vec2 range_opacity;
@@ -101,8 +95,6 @@ attribute float color;
 attribute vec3 color;
 #endif
 
-#define SCALE_X(x) scale_transform_linear(x, range_x, domain_x)
-#define SCALE_Y(x) scale_transform_linear(x, range_y, domain_y)
 #define SCALE_SIZE(x) scale_transform_linear(x, range_size, domain_size)
 #define SCALE_ROTATION(x) scale_transform_linear(x, range_rotation, domain_rotation)
 #define SCALE_OPACITY(x) scale_transform_linear(x, range_opacity, domain_opacity)

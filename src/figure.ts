@@ -13,6 +13,11 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 THREE.ShaderChunk['scales'] =
   require('raw-loader!../shaders/scales.glsl').default;
 
+export enum ScaleType {
+  SCALE_TYPE_LINEAR=1,
+  SCALE_TYPE_LOG=2
+};
+
 
 export class FigureGLModel extends FigureModel {
   defaults() {
@@ -73,7 +78,7 @@ export class FigureGLView extends Figure {
     const view = await super.add_mark(model);
 
     // If the mark needs a WebGL renderer, we create it
-    if (view['render_gl']) {
+    if (view['renderGL']) {
       this.createWebGLRenderer();
     }
 
@@ -86,7 +91,7 @@ export class FigureGLView extends Figure {
     this.update_gl();
   }
 
-  async render_gl(): Promise<void> {
+  async renderGL(): Promise<void> {
     // Nothing to render using a WebGL context
     if (!this.renderer) {
       return Promise.resolve();
@@ -100,14 +105,14 @@ export class FigureGLView extends Figure {
 
     const views = await Promise.all(this.mark_views.views);
 
-    // render all marks that have a render_gl method
+    // render all marks that have a renderGL method
     this.renderer.autoClear = false;
     this.renderer.autoClearColor = new (THREE.Color as (x) => void)(0x000000);
     this.renderer.clear();
 
     for (const mark of views) {
-      if (mark['render_gl']) {
-        mark['render_gl']();
+      if (mark['renderGL']) {
+        mark['renderGL']();
       }
     }
   }
@@ -130,7 +135,7 @@ export class FigureGLView extends Figure {
   }
 
   async get_svg() {
-    return this.render_gl().then(() => {
+    return this.renderGL().then(() => {
       return super.get_svg();
     });
   }
@@ -143,7 +148,7 @@ export class FigureGLView extends Figure {
   }
 
   _update_gl() {
-    this.render_gl();
+    this.renderGL();
     this._update_requested = false;
   }
 

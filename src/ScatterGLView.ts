@@ -23,7 +23,7 @@ import * as d3 from 'd3';
 import * as _ from 'underscore';
 import { ScatterGLModel } from './ScatterGLModel';
 import * as THREE from 'three';
-import { FigureGLView } from './figure';
+import { ScaleType, FigureGLView } from './figure';
 
 type TypedArray =
   | Int8Array
@@ -264,46 +264,51 @@ export class ScatterGLView extends Mark {
     const x_parameters = new AttributeParameters(
       to_float_array(this.model.get('x'))
     );
-    this.x = this.initialize_attribute('x', x_parameters);
-    this.x_previous = this.initialize_attribute('x_previous', x_parameters);
+    this.x = this.initializeAttribute('x', x_parameters);
+    this.x_previous = this.initializeAttribute('x_previous', x_parameters);
 
     const y_parameters = new AttributeParameters(
       to_float_array(this.model.get('y'))
     );
-    this.y = this.initialize_attribute('y', y_parameters);
-    this.y_previous = this.initialize_attribute('y_previous', y_parameters);
+    this.y = this.initializeAttribute('y', y_parameters);
+    this.y_previous = this.initializeAttribute('y_previous', y_parameters);
 
     this.markers_number = Math.min(this.x.array.length, this.y.array.length);
     this.instanced_geometry.maxInstancedCount = this.markers_number;
 
-    const color_parameters = this.get_color_attribute_parameters();
-    this.color = this.initialize_attribute('color', color_parameters);
+    const color_parameters = this.getColorAttributeParameters();
+    this.color = this.initializeAttribute('color', color_parameters);
     this.material.defines['USE_COLORMAP'] =
       color_parameters.use_colormap;
 
-    const opacity_parameters = this.get_opacity_attribute_parameters();
-    this.opacity = this.initialize_attribute('opacity', opacity_parameters);
-    this.opacity_previous = this.initialize_attribute(
+    this.material.defines['USE_SCALE_X'] = true;
+    this.material.defines['USE_SCALE_Y'] = true;
+    this.material.defines['SCALE_TYPE_X'] = ScaleType.SCALE_TYPE_LINEAR;
+    this.material.defines['SCALE_TYPE_Y'] = ScaleType.SCALE_TYPE_LINEAR;
+
+    const opacity_parameters = this.getOpacityAttributeParameters();
+    this.opacity = this.initializeAttribute('opacity', opacity_parameters);
+    this.opacity_previous = this.initializeAttribute(
       'opacity_previous',
       opacity_parameters
     );
 
-    const size_parameters = this.get_size_attribute_parameters();
-    this.size = this.initialize_attribute('size', size_parameters);
-    this.size_previous = this.initialize_attribute(
+    const size_parameters = this.getSizeAttributeParameters();
+    this.size = this.initializeAttribute('size', size_parameters);
+    this.size_previous = this.initializeAttribute(
       'size_previous',
       size_parameters
     );
 
-    const rotation_parameters = this.get_rotation_attribute_parameters();
-    this.rotation = this.initialize_attribute('rotation', rotation_parameters);
-    this.rotation_previous = this.initialize_attribute(
+    const rotation_parameters = this.getRotationAttributeParameters();
+    this.rotation = this.initializeAttribute('rotation', rotation_parameters);
+    this.rotation_previous = this.initializeAttribute(
       'rotation_previous',
       rotation_parameters
     );
 
-    const selected_parameters = this.get_selected_attribute_parameters();
-    this.selected = this.initialize_attribute('selected', selected_parameters);
+    const selected_parameters = this.getSelectedAttributeParameters();
+    this.selected = this.initializeAttribute('selected', selected_parameters);
     this.material.uniforms['has_selection'].value =
       selected_parameters.use_selection;
 
@@ -313,13 +318,13 @@ export class ScatterGLView extends Mark {
 
     this.create_listeners();
     this.compute_view_padding();
-    this.update_scene();
+    this.updateScene();
     this.listenTo(this.parent, 'margin_updated', () => {
-      this.update_scene();
+      this.updateScene();
     });
   }
 
-  initialize_attribute(name: string, parameters: AttributeParameters) {
+  initializeAttribute(name: string, parameters: AttributeParameters) {
     const attribute = new THREE.InstancedBufferAttribute(
       parameters.array,
       parameters.item_size,
@@ -332,7 +337,7 @@ export class ScatterGLView extends Mark {
     return attribute;
   }
 
-  get_color_attribute_parameters() {
+  getColorAttributeParameters() {
     if (this.model.get('color')) {
       const color = this.model.get('color');
 
@@ -383,7 +388,7 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  get_opacity_attribute_parameters() {
+  getOpacityAttributeParameters() {
     let opacities = this.model.get('opacities') || [1];
 
     if (opacities.length == 0) {
@@ -425,7 +430,7 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  get_size_attribute_parameters() {
+  getSizeAttributeParameters() {
     if (this.model.get('size')) {
       // One size per marker
       const size = this.model.get('size');
@@ -450,7 +455,7 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  get_rotation_attribute_parameters() {
+  getRotationAttributeParameters() {
     if (this.model.get('rotation')) {
       const rotation = this.model.get('rotation');
 
@@ -468,7 +473,7 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  get_selected_attribute_parameters() {
+  getSelectedAttributeParameters() {
     if (this.model.get('selected')) {
       const selected = this.model.get('selected');
       const array = to_float_array(this.markers_number);
@@ -491,11 +496,11 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  update_scene() {
+  updateScene() {
     this.parent.update_gl();
   }
 
-  render_gl() {
+  renderGL() {
     this.set_ranges();
     const fig = this.parent;
     const x_scale = this.scales.x ? this.scales.x : this.parent.scale_x;
@@ -582,46 +587,46 @@ export class ScatterGLView extends Mark {
     }
     this.transitions = transitions_todo;
     if (this.transitions.length > 0) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
   create_listeners() {
     super.create_listeners();
 
-    this.listenTo(this.model, 'change:x', this.update_x);
-    this.listenTo(this.model, 'change:y', this.update_y);
+    this.listenTo(this.model, 'change:x', this.updateX);
+    this.listenTo(this.model, 'change:y', this.updateY);
 
     this.listenTo(
       this.model,
       'change:color change:colors change:unselected_style',
-      this.update_color
+      this.updateColor
     );
     this.listenTo(
       this.model,
       'change:opacity change:opacities',
-      this.update_opacity
+      this.updateOpacity
     );
     this.listenTo(
       this.model,
       'change:size change:default_size',
-      this.update_size
+      this.updateSize
     );
-    this.listenTo(this.model, 'change:rotation', this.update_rotation);
-    this.listenTo(this.model, 'change:selected', this.update_selected);
+    this.listenTo(this.model, 'change:rotation', this.updateRotation);
+    this.listenTo(this.model, 'change:selected', this.updateSelected);
 
-    this.listenTo(this.model, 'change:marker', this.update_marker);
-    this.update_marker();
+    this.listenTo(this.model, 'change:marker', this.updateMarker);
+    this.updateMarker();
 
-    this.listenTo(this.model, 'change:stroke', this.update_stroke);
-    this.update_stroke();
+    this.listenTo(this.model, 'change:stroke', this.updateStroke);
+    this.updateStroke();
 
-    this.listenTo(this.model, 'change:stroke_width', this.update_stroke_width);
-    this.update_stroke_width();
+    this.listenTo(this.model, 'change:stroke_width', this.updateStrokeWidth);
+    this.updateStrokeWidth();
 
     const sync_visible = () => {
       this.mesh.visible = this.model.get('visible');
-      this.update_scene();
+      this.updateScene();
     };
     this.listenTo(this.model, 'change:visible', sync_visible);
     sync_visible();
@@ -629,7 +634,7 @@ export class ScatterGLView extends Mark {
     const sync_fill = () => {
       this.material.defines['FILL'] = this.model.get('fill') ? 1 : 0;
       this.material.needsUpdate = true;
-      this.update_scene();
+      this.updateScene();
     };
     this.listenTo(this.model, 'change:fill', sync_fill);
     sync_fill();
@@ -637,7 +642,7 @@ export class ScatterGLView extends Mark {
     this.listenTo(this.model, 'change', this.update_legend);
   }
 
-  update_attribute(
+  updateAttribute(
     name: string,
     value: THREE.InstancedBufferAttribute,
     new_parameters: AttributeParameters
@@ -645,9 +650,9 @@ export class ScatterGLView extends Mark {
     // Workaround, updating `meshPerAttribute` does not work in ThreeJS and can result in a buffer overflow
     // so we need to re-initialize the attribute. Same for an array size increase.
     if (value.meshPerAttribute != new_parameters.mesh_per_attribute) {
-      value = this.initialize_attribute(name, new_parameters);
+      value = this.initializeAttribute(name, new_parameters);
     } else if (value.array.length < new_parameters.array.length) {
-      value = this.initialize_attribute(name, new_parameters);
+      value = this.initializeAttribute(name, new_parameters);
     } else {
       value.itemSize = new_parameters.item_size;
       value.setArray(new_parameters.array);
@@ -658,7 +663,7 @@ export class ScatterGLView extends Mark {
     return value;
   }
 
-  update_attributes(
+  updateAttributes(
     name: string,
     value: THREE.InstancedBufferAttribute,
     value_previous: THREE.InstancedBufferAttribute,
@@ -675,7 +680,7 @@ export class ScatterGLView extends Mark {
         const array = deepCopy(new_parameters.array);
         // array.fill(default_value);
         array.set(value.array);
-        value_previous = this.update_attribute(
+        value_previous = this.updateAttribute(
           name + '_previous',
           value_previous,
           new AttributeParameters(
@@ -692,7 +697,7 @@ export class ScatterGLView extends Mark {
         value.array.length == new_parameters.array.length &&
         value.meshPerAttribute != new_parameters.mesh_per_attribute
       ) {
-        value_previous = this.update_attribute(
+        value_previous = this.updateAttribute(
           name + '_previous',
           value_previous,
           new AttributeParameters(
@@ -703,7 +708,7 @@ export class ScatterGLView extends Mark {
           )
         );
       } else {
-        value_previous = this.update_attribute(
+        value_previous = this.updateAttribute(
           name + '_previous',
           value_previous,
           new AttributeParameters(
@@ -715,22 +720,22 @@ export class ScatterGLView extends Mark {
         );
       }
 
-      value = this.update_attribute(name, value, new_parameters);
+      value = this.updateAttribute(name, value, new_parameters);
 
-      this.animate_attribute(name, after_animation);
+      this.animateAttribute(name, after_animation);
     } else {
-      value_previous = this.update_attribute(
+      value_previous = this.updateAttribute(
         name + '_previous',
         value_previous,
         new_parameters
       );
-      value = this.update_attribute(name, value, new_parameters);
+      value = this.updateAttribute(name, value, new_parameters);
     }
 
     return [value, value_previous];
   }
 
-  animate_attribute(name: string, after_animation: Function = () => {}) {
+  animateAttribute(name: string, after_animation: Function = () => {}) {
     this.material.uniforms['animation_time_' + name]['value'] = 0;
     const set = (value) => {
       this.material.uniforms['animation_time_' + name]['value'] = value;
@@ -738,17 +743,17 @@ export class ScatterGLView extends Mark {
     this.transition(set, after_animation, this);
   }
 
-  update_x(rerender: boolean = true) {
+  updateX(rerender: boolean = true) {
     const x_array = to_float_array(this.model.get('x'));
 
     const new_markers_number = Math.min(x_array.length, this.y.array.length);
 
     // If the `markers_number` changes
     if (this.markers_number != new_markers_number) {
-      this.update_markers_number(new_markers_number);
+      this.updateMarkersNumber(new_markers_number);
     }
 
-    [this.x, this.x_previous] = this.update_attributes(
+    [this.x, this.x_previous] = this.updateAttributes(
       'x',
       this.x,
       this.x_previous,
@@ -756,21 +761,21 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_y(rerender: boolean = true) {
+  updateY(rerender: boolean = true) {
     const y_array = to_float_array(this.model.get('y'));
 
     const new_markers_number = Math.min(this.x.array.length, y_array.length);
 
     // If the `markers_number` changes
     if (this.markers_number != new_markers_number) {
-      this.update_markers_number(new_markers_number);
+      this.updateMarkersNumber(new_markers_number);
     }
 
-    [this.y, this.y_previous] = this.update_attributes(
+    [this.y, this.y_previous] = this.updateAttributes(
       'y',
       this.y,
       this.y_previous,
@@ -778,11 +783,11 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_markers_number(n: number) {
+  updateMarkersNumber(n: number) {
     const old_markers_number = this.markers_number;
 
     this.markers_number = n;
@@ -790,21 +795,21 @@ export class ScatterGLView extends Mark {
 
     // Increasing the number of markers, we need to update buffer sizes in
     // order to prevent buffer overflows. We assume here that
-    // `update_markers_number` is called from `update_x` or `update_y` hence they
+    // `updateMarkersNumber` is called from `updateX` or `updateY` hence they
     // are already correctly sized
     // If the number of markers has decreased, no need to change the buffer sizes
     if (this.markers_number > old_markers_number) {
-      this.update_color(false);
-      this.update_opacity(false);
-      this.update_size(false);
-      this.update_rotation(false);
-      this.update_selected(false);
+      this.updateColor(false);
+      this.updateOpacity(false);
+      this.updateSize(false);
+      this.updateRotation(false);
+      this.updateSelected(false);
     }
   }
 
-  update_color(rerender: boolean = true) {
-    const color_parameters = this.get_color_attribute_parameters();
-    this.color = this.update_attribute('color', this.color, color_parameters);
+  updateColor(rerender: boolean = true) {
+    const color_parameters = this.getColorAttributeParameters();
+    this.color = this.updateAttribute('color', this.color, color_parameters);
     this.color.normalized = color_parameters.normalized;
     this.material.defines['USE_COLORMAP'] =
       color_parameters.use_colormap;
@@ -812,13 +817,13 @@ export class ScatterGLView extends Mark {
     this.material.needsUpdate = true;
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_opacity(rerender: boolean = true) {
-    const opacity_parameters = this.get_opacity_attribute_parameters();
-    [this.opacity, this.opacity_previous] = this.update_attributes(
+  updateOpacity(rerender: boolean = true) {
+    const opacity_parameters = this.getOpacityAttributeParameters();
+    [this.opacity, this.opacity_previous] = this.updateAttributes(
       'opacity',
       this.opacity,
       this.opacity_previous,
@@ -826,13 +831,13 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_size(rerender: boolean = true) {
-    const size_parameters = this.get_size_attribute_parameters();
-    [this.size, this.size_previous] = this.update_attributes(
+  updateSize(rerender: boolean = true) {
+    const size_parameters = this.getSizeAttributeParameters();
+    [this.size, this.size_previous] = this.updateAttributes(
       'size',
       this.size,
       this.size_previous,
@@ -840,13 +845,13 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_rotation(rerender: boolean = true) {
-    const rotation_parameters = this.get_rotation_attribute_parameters();
-    [this.rotation, this.rotation_previous] = this.update_attributes(
+  updateRotation(rerender: boolean = true) {
+    const rotation_parameters = this.getRotationAttributeParameters();
+    [this.rotation, this.rotation_previous] = this.updateAttributes(
       'rotation',
       this.rotation,
       this.rotation_previous,
@@ -854,13 +859,13 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_selected(rerender: boolean = true) {
-    const selected_parameters = this.get_selected_attribute_parameters();
-    this.selected = this.update_attribute(
+  updateSelected(rerender: boolean = true) {
+    const selected_parameters = this.getSelectedAttributeParameters();
+    this.selected = this.updateAttribute(
       'selected',
       this.selected,
       selected_parameters
@@ -869,11 +874,11 @@ export class ScatterGLView extends Mark {
       selected_parameters.use_selection;
 
     if (rerender) {
-      this.update_scene();
+      this.updateScene();
     }
   }
 
-  update_marker() {
+  updateMarker() {
     const FAST_CIRCLE = 1;
     const FAST_SQUARE = 2;
     const FAST_ARROW = 3;
@@ -913,10 +918,10 @@ export class ScatterGLView extends Mark {
     }
 
     this.material.needsUpdate = true;
-    this.update_scene();
+    this.updateScene();
   }
 
-  update_stroke() {
+  updateStroke() {
     const stroke = this.model.get('stroke');
 
     if (stroke) {
@@ -928,16 +933,16 @@ export class ScatterGLView extends Mark {
     }
 
     this.material.needsUpdate = true;
-    this.update_scene();
+    this.updateScene();
   }
 
-  update_stroke_width() {
+  updateStrokeWidth() {
     this.material.uniforms.stroke_width.value =
       this.model.get('stroke_width');
-    this.update_scene();
+    this.updateScene();
   }
 
-  update_color_map() {
+  updateColorMap() {
     this.material.uniforms['colormap'].value = create_colormap(
       this.scales.color
     );
@@ -975,26 +980,26 @@ export class ScatterGLView extends Mark {
       }
     }
 
-    this.update_scene();
+    this.updateScene();
   }
 
-  update_position(animate?) {
-    this.update_scene();
-    this.invalidate_pixel_position();
+  updatePosition(animate?) {
+    this.updateScene();
+    this.invalidatePixelPosition();
   }
 
   // we want to compute the pixels coordinates 'lazily', since it's quite expensive for 10^6 points
-  invalidate_pixel_position() {
+  invalidatePixelPosition() {
     this.invalidated_pixel_position = true;
   }
 
-  ensure_pixel_position() {
+  ensurePixelPosition() {
     if (this.invalidated_pixel_position) {
-      this.update_pixel_position();
+      this.updatePixelPosition();
     }
   }
 
-  update_pixel_position(animate?) {
+  updatePixelPosition(animate?) {
     const x_scale = this.scales.x,
       y_scale = this.scales.y;
 
@@ -1027,7 +1032,7 @@ export class ScatterGLView extends Mark {
 
   _real_selector_changed(point_selector, rect_selector) {
     // not sure why selection isn't working yet
-    this.ensure_pixel_position();
+    this.ensurePixelPosition();
     if (point_selector === undefined) {
       this.model.set('selected', null);
       this.touch();
@@ -1060,13 +1065,13 @@ export class ScatterGLView extends Mark {
     this.listenTo(this.x_scale, 'domain_changed', function () {
       if (!this.model.dirty) {
         const animate = true;
-        this.update_position(animate);
+        this.updatePosition(animate);
       }
     });
     this.listenTo(this.y_scale, 'domain_changed', function () {
       if (!this.model.dirty) {
         const animate = true;
-        this.update_position(animate);
+        this.updatePosition(animate);
       }
     });
   }
@@ -1079,23 +1084,23 @@ export class ScatterGLView extends Mark {
     // the following handlers are for changes in data that does not
     // impact the position of the elements
     if (color_scale) {
-      this.listenTo(color_scale, 'all', this.update_color_map);
-      this.listenTo(this.model, 'change:color', this.update_color_map);
-      this.update_color_map();
+      this.listenTo(color_scale, 'all', this.updateColorMap);
+      this.listenTo(this.model, 'change:color', this.updateColorMap);
+      this.updateColorMap();
     }
     if (size_scale) {
       this.listenTo(size_scale, 'domain_changed', () => {
-        this.update_scene();
+        this.updateScene();
       });
     }
     if (opacity_scale) {
       this.listenTo(opacity_scale, 'domain_changed', () => {
-        this.update_scene();
+        this.updateScene();
       });
     }
     if (rotation_scale) {
       this.listenTo(rotation_scale, 'domain_changed', () => {
-        this.update_scene();
+        this.updateScene();
       });
     }
   }
@@ -1108,22 +1113,22 @@ export class ScatterGLView extends Mark {
       skew_scale = this.scales.skew,
       rotation_scale = this.scales.rotation;
     if (x_scale) {
-      x_scale.set_range(this.parent.padded_range('x', x_scale.model));
+      x_scale.setRange(this.parent.padded_range('x', x_scale.model));
     }
     if (y_scale) {
-      y_scale.set_range(this.parent.padded_range('y', y_scale.model));
+      y_scale.setRange(this.parent.padded_range('y', y_scale.model));
     }
     if (size_scale) {
-      size_scale.set_range([0, this.model.get('default_size')]);
+      size_scale.setRange([0, this.model.get('default_size')]);
     }
     if (opacity_scale) {
-      opacity_scale.set_range([0.2, 1]);
+      opacity_scale.setRange([0.2, 1]);
     }
     if (skew_scale) {
-      skew_scale.set_range([0, 1]);
+      skew_scale.setRange([0, 1]);
     }
     if (rotation_scale) {
-      rotation_scale.set_range([0, Math.PI]); // TODO: this mirrors the 180 from the normal scatter, but why not 360?
+      rotation_scale.setRange([0, Math.PI]); // TODO: this mirrors the 180 from the normal scatter, but why not 360?
     }
   }
 
@@ -1159,12 +1164,12 @@ export class ScatterGLView extends Mark {
             this.called_on_done = true;
             on_done.apply(context);
           }
-          that.update_scene();
+          that.updateScene();
         });
       if (!this.duration) {
         f.apply(context, [1]);
         on_done.apply(context);
-        that.update_scene();
+        that.updateScene();
       } else {
         that.transitions.push(this);
       }
@@ -1245,7 +1250,7 @@ export class ScatterGLView extends Mark {
 
   relayout() {
     this.set_ranges();
-    this.update_position();
+    this.updatePosition();
   }
 
   compute_view_padding() {
