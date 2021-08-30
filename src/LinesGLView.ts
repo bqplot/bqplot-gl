@@ -163,7 +163,7 @@ export class LinesGLView extends Lines {
   }
 
   renderGL() {
-    var fig = this.parent;
+    const fig = this.parent;
 
     const x_scale = this.scales.x ? this.scales.x : this.parent.scale_x;
     const y_scale = this.scales.y ? this.scales.y : this.parent.scale_y;
