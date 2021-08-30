@@ -13,12 +13,7 @@
  * limitations under the License.
  */
 
-import {
-    Mark,
-    symbol as bqSymbol,
-    deepCopy,
-    Scale
-} from 'bqplot';
+import { Mark, symbol as bqSymbol, deepCopy, Scale } from 'bqplot';
 import * as d3 from 'd3';
 import * as _ from 'underscore';
 import { ScatterGLModel } from './ScatterGLModel';
@@ -278,8 +273,7 @@ export class ScatterGLView extends Mark {
 
     const color_parameters = this.getColorAttributeParameters();
     this.color = this.initializeAttribute('color', color_parameters);
-    this.material.defines['USE_COLORMAP'] =
-      color_parameters.use_colormap;
+    this.material.defines['USE_COLORMAP'] = color_parameters.use_colormap;
 
     this.material.defines['USE_SCALE_X'] = true;
     this.material.defines['USE_SCALE_Y'] = true;
@@ -511,36 +505,26 @@ export class ScatterGLView extends Mark {
 
     _.each(['selected', 'hovered'], (style_type) => {
       _.each(['stroke', 'fill', 'opacity'], (style_property) => {
-        this.material.uniforms[
-          `has_${style_type}_${style_property}`
-        ].value = Boolean(
-          this.model.get(`${style_type}_style`)[style_property]
-        );
-        this.material.uniforms[
-          `has_un${style_type}_${style_property}`
-        ].value = Boolean(
-          this.model.get(`un${style_type}_style`)[style_property]
-        );
+        this.material.uniforms[`has_${style_type}_${style_property}`].value =
+          Boolean(this.model.get(`${style_type}_style`)[style_property]);
+        this.material.uniforms[`has_un${style_type}_${style_property}`].value =
+          Boolean(this.model.get(`un${style_type}_style`)[style_property]);
         if (_.contains(['opacity'], style_property)) {
-          this.material.uniforms[
-            `${style_type}_${style_property}`
-          ].value = this.model.get(`${style_type}_style`)[style_property];
-          this.material.uniforms[
-            `un${style_type}_${style_property}`
-          ].value = this.model.get(`un${style_type}_style`)[style_property];
+          this.material.uniforms[`${style_type}_${style_property}`].value =
+            this.model.get(`${style_type}_style`)[style_property];
+          this.material.uniforms[`un${style_type}_${style_property}`].value =
+            this.model.get(`un${style_type}_style`)[style_property];
         } else {
-          this.material.uniforms[
-            `${style_type}_${style_property}`
-          ].value = color_to_array_rgba(
-            this.model.get(`${style_type}_style`)[style_property],
-            'green'
-          );
-          this.material.uniforms[
-            `un${style_type}_${style_property}`
-          ].value = color_to_array_rgba(
-            this.model.get(`un${style_type}_style`)[style_property],
-            'green'
-          );
+          this.material.uniforms[`${style_type}_${style_property}`].value =
+            color_to_array_rgba(
+              this.model.get(`${style_type}_style`)[style_property],
+              'green'
+            );
+          this.material.uniforms[`un${style_type}_${style_property}`].value =
+            color_to_array_rgba(
+              this.model.get(`un${style_type}_style`)[style_property],
+              'green'
+            );
         }
       });
     });
@@ -811,8 +795,7 @@ export class ScatterGLView extends Mark {
     const color_parameters = this.getColorAttributeParameters();
     this.color = this.updateAttribute('color', this.color, color_parameters);
     this.color.normalized = color_parameters.normalized;
-    this.material.defines['USE_COLORMAP'] =
-      color_parameters.use_colormap;
+    this.material.defines['USE_COLORMAP'] = color_parameters.use_colormap;
 
     this.material.needsUpdate = true;
 
@@ -891,8 +874,7 @@ export class ScatterGLView extends Mark {
 
     if (marker === 'circle') {
       // same as in ./Markers.js
-      this.material.uniforms.marker_scale.value =
-        1 / Math.sqrt(Math.PI);
+      this.material.uniforms.marker_scale.value = 1 / Math.sqrt(Math.PI);
       this.material.defines['FAST_DRAW'] = FAST_CIRCLE;
     }
     if (marker === 'square') {
@@ -904,8 +886,7 @@ export class ScatterGLView extends Mark {
       this.material.defines['FAST_DRAW'] = FAST_ARROW;
     }
     if (marker === 'cross') {
-      this.material.uniforms.marker_scale.value =
-        3 / (2 * Math.sqrt(5));
+      this.material.uniforms.marker_scale.value = 3 / (2 * Math.sqrt(5));
       this.material.defines['FAST_DRAW'] = FAST_CROSS;
     }
     if (marker === 'triangle-up') {
@@ -937,8 +918,7 @@ export class ScatterGLView extends Mark {
   }
 
   updateStrokeWidth() {
-    this.material.uniforms.stroke_width.value =
-      this.model.get('stroke_width');
+    this.material.uniforms.stroke_width.value = this.model.get('stroke_width');
     this.updateScene();
   }
 

@@ -17,7 +17,6 @@ import { ScatterModel } from 'bqplot';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
-
 export class ScatterGLModel extends ScatterModel {
   defaults() {
     return {
@@ -27,7 +26,7 @@ export class ScatterGLModel extends ScatterModel {
       _model_module_version: ScatterGLModel.model_module_version,
       _view_name: ScatterGLModel.view_name,
       _view_module: ScatterGLModel.view_module,
-      _view_module_version: ScatterGLModel.view_module_version
+      _view_module_version: ScatterGLModel.view_module_version,
     };
   }
 

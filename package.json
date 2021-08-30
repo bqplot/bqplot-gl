@@ -39,13 +39,15 @@
     "clean:lib": "rimraf lib",
     "clean:labextension": "rimraf bqplot-gl/labextension",
     "clean:nbextension": "rimraf bqplot-gl/nbextension/static/index.js",
-    "lint": "eslint . --ext .ts,.tsx --fix",
-    "lint:check": "eslint . --ext .ts,.tsx",
     "prepack": "yarn run build:lib",
     "watch": "npm-run-all -p watch:*",
     "watch:lib": "tsc -w",
     "watch:nbextension": "webpack --watch --mode=development",
-    "watch:labextension": "jupyter labextension watch ."
+    "watch:labextension": "jupyter labextension watch .",
+    "prettier:check": "prettier src --check",
+    "prettier:fix": "prettier src --write",
+    "eslint:check": "eslint src --ext .ts",
+    "eslint:fix": "eslint src --ext .ts --fix"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10 || ^2.0.0 || ^3.0.0 || ^4.0.0",
