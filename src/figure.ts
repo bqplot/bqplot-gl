@@ -3,21 +3,17 @@
 
 import * as THREE from 'three';
 
-import {
-  Figure, FigureModel, Mark, MarkModel
-} from 'bqplot';
+import { Figure, FigureModel, Mark, MarkModel } from 'bqplot';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
-
 
 THREE.ShaderChunk['scales'] =
   require('raw-loader!../shaders/scales.glsl').default;
 
 export enum ScaleType {
-  SCALE_TYPE_LINEAR=1,
-  SCALE_TYPE_LOG=2
-};
-
+  SCALE_TYPE_LINEAR = 1,
+  SCALE_TYPE_LOG = 2,
+}
 
 export class FigureGLModel extends FigureModel {
   defaults() {
@@ -28,7 +24,7 @@ export class FigureGLModel extends FigureModel {
       _model_module_version: FigureGLModel.model_module_version,
       _view_name: FigureGLModel.view_name,
       _view_module: FigureGLModel.view_module,
-      _view_module_version: FigureGLModel.view_module_version
+      _view_module_version: FigureGLModel.view_module_version,
     };
   }
 
@@ -39,7 +35,6 @@ export class FigureGLModel extends FigureModel {
   static view_module = MODULE_NAME;
   static view_module_version = MODULE_VERSION;
 }
-
 
 export class FigureGLView extends Figure {
   private createWebGLRenderer() {

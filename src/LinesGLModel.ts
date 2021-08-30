@@ -17,7 +17,6 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 
 import { LinesModel } from 'bqplot';
 
-
 export class LinesGLModel extends LinesModel {
   defaults() {
     return {
@@ -27,8 +26,8 @@ export class LinesGLModel extends LinesModel {
       _model_module_version: LinesGLModel.model_module_version,
       _view_name: LinesGLModel.view_name,
       _view_module: LinesGLModel.view_module,
-      _view_module_version: LinesGLModel.view_module_version
-    }
+      _view_module_version: LinesGLModel.view_module_version,
+    };
   }
 
   static model_name = 'LinesGLModel';

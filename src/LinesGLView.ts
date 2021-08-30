@@ -1,10 +1,6 @@
-import {
-  isLinearScale
-} from 'bqscales';
+import { isLinearScale } from 'bqscales';
 
-import {
-    Lines
-} from 'bqplot';
+import { Lines } from 'bqplot';
 
 import * as THREE from 'three';
 
@@ -23,20 +19,18 @@ import { LinesGLModel } from './LinesGLModel';
 
 import { Values } from './values';
 
-
 export class LinesGLView extends Lines {
-
   async render() {
     await super.render();
 
     // Create material for markers
     this.material = new THREE.LineMaterial();
-    this.material.uniforms.domain_x = { type: "2f", value: [0., 1.] };
-    this.material.uniforms.domain_y = { type: "2f", value: [0., 1.] };
-    this.material.uniforms.range_x = { type: "2f", value: [0., 1.] };
-    this.material.uniforms.range_y = { type: "2f", value: [0., 1.] };
-    this.material.uniforms.diffuse = {type: '3f', value: [1, 0, 0]};
-    this.material.uniforms.opacity = {type: 'f', value: 1.0};
+    this.material.uniforms.domain_x = { type: '2f', value: [0, 1] };
+    this.material.uniforms.domain_y = { type: '2f', value: [0, 1] };
+    this.material.uniforms.range_x = { type: '2f', value: [0, 1] };
+    this.material.uniforms.range_y = { type: '2f', value: [0, 1] };
+    this.material.uniforms.diffuse = { type: '3f', value: [1, 0, 0] };
+    this.material.uniforms.opacity = { type: 'f', value: 1.0 };
 
     this.material.defines.USE_SCALE_X = true;
     this.material.defines.USE_SCALE_Y = true;
@@ -68,8 +62,11 @@ export class LinesGLView extends Lines {
     });
   }
 
-  beforeCompile(shader) {// we include the scales header, and a snippet that uses the scales
-    shader.vertexShader = "// added by bqplot-image-gl\n#include <scales>\n // added by bqplot-image-gl\n" + shader.vertexShader;
+  beforeCompile(shader) {
+    // we include the scales header, and a snippet that uses the scales
+    shader.vertexShader =
+      '// added by bqplot-image-gl\n#include <scales>\n // added by bqplot-image-gl\n' +
+      shader.vertexShader;
 
     const transform = `
       vec3 instanceStart_transformed = instanceStart;
@@ -83,36 +80,48 @@ export class LinesGLView extends Lines {
     `;
 
     // we modify the shader to replace a piece
-    const begin = 'vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );'
+    const begin = 'vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );';
     const offset_begin = shader.vertexShader.indexOf(begin);
     if (offset_begin == -1) {
-        console.error('Could not find magic begin line in shader');
+      console.error('Could not find magic begin line in shader');
     }
     const end = 'vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );';
     const offset_end = shader.vertexShader.indexOf(end);
     if (offset_end == -1) {
-        console.error('Could not find magic end line in shader');
+      console.error('Could not find magic end line in shader');
     }
-    shader.vertexShader = shader.vertexShader.slice(0, offset_begin) + transform + shader.vertexShader.slice(offset_end + end.length);
+    shader.vertexShader =
+      shader.vertexShader.slice(0, offset_begin) +
+      transform +
+      shader.vertexShader.slice(offset_end + end.length);
   }
 
   updateGeometry() {
-    const scalar_names = ["x", "y", "z"];
+    const scalar_names = ['x', 'y', 'z'];
     const vector4_names = [];
     const get_value = (name, index, default_value) => {
-        if (name === "z") {
-            return 0;
-        }
-        return this.model.get(name);
-    }
+      if (name === 'z') {
+        return 0;
+      }
+      return this.model.get(name);
+    };
     const sequence_index = 0; // not used (see ipyvolume)
-    const current = new Values(scalar_names, [], get_value, sequence_index, vector4_names);
-    current.ensure_array('z')
-    current.merge_to_vec3(["x", "y", "z"], "position");
+    const current = new Values(
+      scalar_names,
+      [],
+      get_value,
+      sequence_index,
+      vector4_names
+    );
+    current.ensure_array('z');
+    current.merge_to_vec3(['x', 'y', 'z'], 'position');
     // important to reset this, otherwise we may use an old buffered value
     // Note that if we upgrade threejs, this may be named differently https://github.com/mrdoob/three.js/issues/18990
     this.geometry.maxInstancedCount = undefined;
-    this.geometry.setDrawRange(0, Math.min(this.model.get('x').length, this.model.get('y').length));
+    this.geometry.setDrawRange(
+      0,
+      Math.min(this.model.get('x').length, this.model.get('y').length)
+    );
     this.geometry.setPositions(current.array_vec3['position']);
 
     this.updateScene();
@@ -126,10 +135,10 @@ export class LinesGLView extends Lines {
     const color = new THREE.Color(this.model.get('colors')[0]);
     this.material.color = color.toArray();
     const opacities = this.model.get('opacities');
-    if(opacities && opacities.length) {
-        this.material.uniforms.opacity.value = opacities[0];
+    if (opacities && opacities.length) {
+      this.material.uniforms.opacity.value = opacities[0];
     } else {
-        this.material.uniforms.opacity.value = 1.;
+      this.material.uniforms.opacity.value = 1;
     }
     this.updateScene();
   }
@@ -143,8 +152,12 @@ export class LinesGLView extends Lines {
     const x_scale = this.scales.x ? this.scales.x : this.parent.scale_x;
     const y_scale = this.scales.y ? this.scales.y : this.parent.scale_y;
 
-    this.material.defines.SCALE_TYPE_X = isLinearScale(x_scale) ? ScaleType.SCALE_TYPE_LINEAR : ScaleType.SCALE_TYPE_LOG;
-    this.material.defines.SCALE_TYPE_Y = isLinearScale(y_scale) ? ScaleType.SCALE_TYPE_LINEAR : ScaleType.SCALE_TYPE_LOG;
+    this.material.defines.SCALE_TYPE_X = isLinearScale(x_scale)
+      ? ScaleType.SCALE_TYPE_LINEAR
+      : ScaleType.SCALE_TYPE_LOG;
+    this.material.defines.SCALE_TYPE_Y = isLinearScale(y_scale)
+      ? ScaleType.SCALE_TYPE_LINEAR
+      : ScaleType.SCALE_TYPE_LOG;
 
     this.material.needsUpdate = true;
   }
@@ -163,7 +176,10 @@ export class LinesGLView extends Lines {
 
     this.material.uniforms['range_x'].value = range_x;
     this.material.uniforms['range_y'].value = [range_y[1], range_y[0]];
-    this.material.uniforms['resolution'].value = [fig.plotarea_width, fig.plotarea_height];
+    this.material.uniforms['resolution'].value = [
+      fig.plotarea_width,
+      fig.plotarea_height,
+    ];
     this.updateMaterialScales();
 
     fig.renderer.render(this.scene, fig.camera);
