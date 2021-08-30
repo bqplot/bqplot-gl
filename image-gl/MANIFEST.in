@@ -1,3 +1,0 @@
-recursive-include bqplot_image_gl/static *.*
-recursive-include etc *.json
-recursive-include share *.*
