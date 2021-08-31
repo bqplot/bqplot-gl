@@ -154,3 +154,5 @@ bqplot_gl/labextension/*.tgz
 
 # Packed lab extensions
 bqplot_gl/labextension
+
+ui-tests/test-output/*
