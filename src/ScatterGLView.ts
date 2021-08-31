@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { ColorScale } from 'bqscales';
 import { Mark, symbol as bqSymbol, deepCopy, Scale } from 'bqplot';
 import * as d3 from 'd3';
 import * as _ from 'underscore';
@@ -56,9 +57,9 @@ const color_to_array_rgba = function (color: any, default_color?: any) {
   }
 };
 
-const create_colormap = function (scale: any) {
+const create_colormap = function (scale: ColorScale) {
   // convert the d3 color scale to a texture
-  const colors = scale ? scale.model.color_range : ['#ff0000', '#ff0000'];
+  const colors = scale ? scale.model.colorRange : [0, 1];
   const color_scale = d3
     .scaleLinear()
     .range(colors)
