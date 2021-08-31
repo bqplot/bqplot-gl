@@ -20,7 +20,7 @@ import { LinesModel } from 'bqplot';
 export class LinesGLModel extends LinesModel {
   defaults() {
     return {
-      ...LinesModel.prototype.defaults(),
+      ...super.defaults(),
       _model_name: LinesGLModel.model_name,
       _model_module: LinesGLModel.model_module,
       _model_module_version: LinesGLModel.model_module_version,
