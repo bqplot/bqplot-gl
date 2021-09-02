@@ -20,7 +20,7 @@ import { MODULE_NAME, MODULE_VERSION } from './version';
 export class ScatterGLModel extends ScatterModel {
   defaults() {
     return {
-      ...ScatterModel.prototype.defaults(),
+      ...super.defaults(),
       _model_name: ScatterGLModel.model_name,
       _model_module: ScatterGLModel.model_module,
       _model_module_version: ScatterGLModel.model_module_version,

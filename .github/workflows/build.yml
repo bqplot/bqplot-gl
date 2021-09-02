@@ -85,6 +85,9 @@ jobs:
     - name: JavaScript prettyfier
       run: yarn run prettier:check
 
+    - name: JavaScript tests
+      run: yarn run test
+
     - name: Install Galata
       run: yarn install
       working-directory: ui-tests
@@ -109,10 +112,6 @@ jobs:
       with:
         name: ui-test-output
         path: ui-tests/test-output
-
-    # - name: JavaScript tests
-    #   run: yarn run test
-    #   working-directory: js
 
     - name: Build Python package
       run: |
