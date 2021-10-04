@@ -19,7 +19,7 @@ import * as d3 from 'd3';
 import * as _ from 'underscore';
 import { ScatterGLModel } from './ScatterGLModel';
 import * as THREE from 'three';
-import { ScaleType, FigureGLView } from './figure';
+import { ScaleType, initializeBqplotFigure } from './utils';
 
 type TypedArray =
   | Int8Array
@@ -142,6 +142,8 @@ class SelectionAttributeParameters extends AttributeParameters {
 export class ScatterGLView extends Mark {
   async render() {
     const base_render_promise = super.render();
+
+    initializeBqplotFigure(this.parent);
 
     this.transitions = [];
     this.invalidated_pixel_position = true;
@@ -313,10 +315,9 @@ export class ScatterGLView extends Mark {
 
     this.create_listeners();
     this.compute_view_padding();
-    this.updateScene();
-    this.listenTo(this.parent, 'margin_updated', () => {
-      this.updateScene();
-    });
+
+    this.parent.extras.webGLMarks.push(this);
+    this.parent.extras.webGLRequestRender();
   }
 
   initializeAttribute(name: string, parameters: AttributeParameters) {
@@ -491,10 +492,6 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  updateScene() {
-    this.parent.update_gl();
-  }
-
   renderGL() {
     this.set_ranges();
     const fig = this.parent;
@@ -560,7 +557,8 @@ export class ScatterGLView extends Mark {
         this.scales.opacity.scale.domain();
     }
 
-    fig.renderer.render(this.scene, fig.camera);
+    const { renderer, camera } = fig.extras.webGLRenderer;
+    renderer.render(this.scene, camera);
 
     const transitions_todo = [];
     for (let i = 0; i < this.transitions.length; i++) {
@@ -572,7 +570,7 @@ export class ScatterGLView extends Mark {
     }
     this.transitions = transitions_todo;
     if (this.transitions.length > 0) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -611,7 +609,7 @@ export class ScatterGLView extends Mark {
 
     const sync_visible = () => {
       this.mesh.visible = this.model.get('visible');
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     };
     this.listenTo(this.model, 'change:visible', sync_visible);
     sync_visible();
@@ -619,7 +617,7 @@ export class ScatterGLView extends Mark {
     const sync_fill = () => {
       this.material.defines['FILL'] = this.model.get('fill') ? 1 : 0;
       this.material.needsUpdate = true;
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     };
     this.listenTo(this.model, 'change:fill', sync_fill);
     sync_fill();
@@ -746,7 +744,7 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -768,7 +766,7 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -801,7 +799,7 @@ export class ScatterGLView extends Mark {
     this.material.needsUpdate = true;
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -815,7 +813,7 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -829,7 +827,7 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -843,7 +841,7 @@ export class ScatterGLView extends Mark {
     );
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -858,7 +856,7 @@ export class ScatterGLView extends Mark {
       selected_parameters.use_selection;
 
     if (rerender) {
-      this.updateScene();
+      this.parent.extras.webGLRequestRender();
     }
   }
 
@@ -900,7 +898,7 @@ export class ScatterGLView extends Mark {
     }
 
     this.material.needsUpdate = true;
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   updateStroke() {
@@ -915,12 +913,12 @@ export class ScatterGLView extends Mark {
     }
 
     this.material.needsUpdate = true;
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   updateStrokeWidth() {
     this.material.uniforms.stroke_width.value = this.model.get('stroke_width');
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   updateColorMap() {
@@ -961,11 +959,11 @@ export class ScatterGLView extends Mark {
       }
     }
 
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   updatePosition(animate?) {
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
     this.invalidatePixelPosition();
   }
 
@@ -1071,17 +1069,17 @@ export class ScatterGLView extends Mark {
     }
     if (size_scale) {
       this.listenTo(size_scale, 'domain_changed', () => {
-        this.updateScene();
+        this.parent.extras.webGLRequestRender();
       });
     }
     if (opacity_scale) {
       this.listenTo(opacity_scale, 'domain_changed', () => {
-        this.updateScene();
+        this.parent.extras.webGLRequestRender();
       });
     }
     if (rotation_scale) {
       this.listenTo(rotation_scale, 'domain_changed', () => {
-        this.updateScene();
+        this.parent.extras.webGLRequestRender();
       });
     }
   }
@@ -1145,12 +1143,12 @@ export class ScatterGLView extends Mark {
             this.called_on_done = true;
             on_done.apply(context);
           }
-          that.updateScene();
+          that.parent.extras.webGLRequestRender();
         });
       if (!this.duration) {
         f.apply(context, [1]);
         on_done.apply(context);
-        that.updateScene();
+        that.parent.extras.webGLRequestRender();
       } else {
         that.transitions.push(this);
       }
@@ -1288,6 +1286,4 @@ export class ScatterGLView extends Mark {
   dot: any;
 
   model: ScatterGLModel;
-
-  parent: FigureGLView;
 }
