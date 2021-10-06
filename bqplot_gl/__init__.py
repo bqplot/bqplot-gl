@@ -4,7 +4,6 @@
 # Copyright (c) The bqplot Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from .figure import FigureGL  # noqa
 from .marks import *  # noqa
 from ._version import __version__, version_info  # noqa
 

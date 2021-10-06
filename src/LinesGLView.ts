@@ -13,15 +13,17 @@ import 'three/examples/js/lines/LineMaterial';
 import 'three/examples/js/lines/LineSegmentsGeometry';
 import 'three/examples/js/lines/LineGeometry';
 
-import { ScaleType, FigureGLView } from './figure';
-
 import { LinesGLModel } from './LinesGLModel';
 
 import { Values } from './values';
 
+import { ScaleType, initializeBqplotFigure } from './utils';
+
 export class LinesGLView extends Lines {
   async render() {
     await super.render();
+
+    initializeBqplotFigure(this.parent);
 
     // Create material for markers
     this.material = new THREE.LineMaterial();
@@ -56,10 +58,8 @@ export class LinesGLView extends Lines {
     this.listenTo(this.model, 'change:x change:y', this.updateGeometry);
     this.listenTo(this.model, 'change:stroke_width', this.update_stroke_width);
 
-    this.updateScene();
-    this.listenTo(this.parent, 'margin_updated', () => {
-      this.updateScene();
-    });
+    this.parent.extras.webGLMarks.push(this);
+    this.parent.extras.webGLRequestRender();
   }
 
   beforeCompile(shader) {
@@ -124,11 +124,11 @@ export class LinesGLView extends Lines {
     );
     this.geometry.setPositions(current.array_vec3['position']);
 
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   update_line_xy(animate: boolean) {
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   update_style() {
@@ -140,12 +140,12 @@ export class LinesGLView extends Lines {
     } else {
       this.material.uniforms.opacity.value = 1;
     }
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   update_stroke_width() {
     this.material.linewidth = this.model.get('stroke_width');
-    this.updateScene();
+    this.parent.extras.webGLRequestRender();
   }
 
   updateMaterialScales() {
@@ -182,15 +182,8 @@ export class LinesGLView extends Lines {
     ];
     this.updateMaterialScales();
 
-    fig.renderer.render(this.scene, fig.camera);
-  }
-
-  updateScene() {
-    this.parent.update_gl();
-  }
-
-  relayout() {
-    this.updateScene();
+    const { renderer, camera } = fig.extras.webGLRenderer;
+    renderer.render(this.scene, camera);
   }
 
   draw(animate) {}
@@ -202,6 +195,4 @@ export class LinesGLView extends Lines {
   scene: THREE.Scene;
 
   model: LinesGLModel;
-
-  parent: FigureGLView;
 }

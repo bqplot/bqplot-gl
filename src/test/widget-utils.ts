@@ -6,6 +6,15 @@ async function create_model_bqplot(
   id: string,
   args: Object
 ) {
+  return create_model(manager, 'bqplot', `${name}Model`, `${name}`, id, args);
+}
+
+async function create_model_bqplotgl(
+  manager,
+  name: string,
+  id: string,
+  args: Object
+) {
   return create_model(
     manager,
     'bqplot-gl',
@@ -105,7 +114,7 @@ export async function create_figure_scatter(manager, x, y, log = false) {
   const rotation = null;
   const skew = null;
 
-  const scatterModel = await create_model_bqplot(
+  const scatterModel = await create_model_bqplotgl(
     manager,
     'ScatterGL',
     'scatter1',
@@ -130,7 +139,7 @@ export async function create_figure_scatter(manager, x, y, log = false) {
   );
   let figureModel;
   try {
-    figureModel = await create_model_bqplot(manager, 'FigureGL', 'figure1', {
+    figureModel = await create_model_bqplot(manager, 'Figure', 'figure1', {
       scale_x: scales['x'],
       scale_y: scales['y'],
       layout: layout.toJSON(),
