@@ -56,6 +56,10 @@ export function resizeRenderer(
 }
 
 export function initializeBqplotFigure(figure: Figure) {
+  if (!figure.needsWebGLContext) {
+    figure.needsWebGLContext = true;
+  }
+
   if (!figure.extras.webGLRenderer) {
     const ext = figure.extras;
 
