@@ -24,8 +24,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        repository: 'martinRenou/bqplot'
-        ref: 'get_rid_webgl'
+        repository: 'bqplot/bqplot'
         path: 'bqplot'
 
     - name: Setup conda
