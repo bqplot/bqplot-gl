@@ -57,11 +57,4 @@ cmdclass['jsdeps'] = combine_commands(
     ensure_targets(jstargets),
 )
 
-
-setup_args = dict(
-    version=version,
-    cmdclass=cmdclass,
-)
-
-if __name__ == '__main__':
-    setup(**setup_args)
+setup(version=version, cmdclass=cmdclass)
