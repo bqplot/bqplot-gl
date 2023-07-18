@@ -53,12 +53,14 @@
     "@jupyter-widgets/base": "^1.1.10 || ^2 || ^3 || ^4 || ^5 || ^6",
     "@lumino/application": "^1 || ^2",
     "@lumino/widgets": "^1 || ^2",
+    "@types/underscore": "^1.11.5",
     "bqplot": "^0.6.0-alpha.0",
     "bqscales": "^0.3.2",
     "d3": "^5.7.0",
     "is-typedarray": "^1.0.0",
     "lodash": "^4.17.21",
-    "three": "^0.91.0"
+    "three": "^0.91.0",
+    "underscore": "^1.13.6"
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
