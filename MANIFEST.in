@@ -42,3 +42,4 @@ global-exclude .ipynb_checkpoints
 
 include LICENSE
 include pyproject.toml
+include yarn.lock
