@@ -10,6 +10,6 @@ module.exports = {
     url: 'http://localhost:8888/lab',
     reuseExistingServer: !process.env.CI
   },
-  timeout: 600000,
+  timeout: 6000,
   retries: 1
 };

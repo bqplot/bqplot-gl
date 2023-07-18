@@ -156,3 +156,4 @@ bqplot_gl/labextension/*.tgz
 bqplot_gl/labextension
 
 ui-tests/test-output/*
+ui-tests/test-results/*
