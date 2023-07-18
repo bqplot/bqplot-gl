@@ -18,10 +18,15 @@ const testCellOutputs = async (page: IJupyterLabPageFixture, tmpPath: string, th
   const contextPrefix = theme == 'JupyterLab Light' ? 'light' : 'dark';
   page.theme.setTheme(theme);
 
+  console.log('--- OPEN NOTEBOOKS');
+
   for (const notebook of notebooks) {
     let results = [];
+    console.log('--- OPEN NOTEBOOK', notebook);
 
     await page.notebook.openByPath(`${tmpPath}/${notebook}`);
+
+    console.log('--- ACTIVATE NOTEBOOK', notebook);
     await page.notebook.activate(notebook);
 
     let numCellImages = 0;
@@ -32,6 +37,8 @@ const testCellOutputs = async (page: IJupyterLabPageFixture, tmpPath: string, th
 
     await page.notebook.runCellByCell({
       onAfterCellRun: async (cellIndex: number) => {
+        console.log('--- EXECUTE CELL', cellIndex);
+
         const cell = await page.notebook.getCellOutput(cellIndex);
         if (cell) {
           results.push(await cell.screenshot());
