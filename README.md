@@ -42,4 +42,4 @@ ax_y = Axis(scale=sc_y, orientation='vertical', label='Points')
 Figure(marks=[scatter], axes=[ax_x, ax_y], title='Scatter powered by WebGL')
 ```
 
-[](bqplot-gl.webm)
+[bqplot-gl](https://github.com/bqplot/bqplot-gl/assets/21197331/55b88909-3120-41b6-a3ad-494850407bc7)
