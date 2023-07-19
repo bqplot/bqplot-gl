@@ -21,47 +21,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Checkout
-      uses: actions/checkout@v2
+    - name: Install Conda environment with Micromamba
+      uses: mamba-org/provision-with-micromamba@main
       with:
-        repository: 'bqplot/bqplot'
-        path: 'bqplot'
-
-    - name: Setup conda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        activate-environment: bqplot-gl-test
+        environment-name: bqplot-gl-test
         environment-file: test-environment.yml
-        python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
-        auto-activate-base: false
         channels: conda-forge
 
     - name: Install bqplot
-      run: pip install .
-      working-directory: bqplot
-
-    - name: Yarn build bqplot
-      run: |
-        yarn install
-        yarn run build
-      working-directory: bqplot/js
-
-    - name: Yarn install bqplot-gl
-      run: yarn install
-
-    - name: Patch node_modules/bqplot
-      run: |
-        rm -rf bqplot
-        ln -s $GITHUB_WORKSPACE/bqplot/js bqplot
-        ls bqplot
-      working-directory: node_modules
-
-    - name: Yarn build
-      run: yarn run build
+      run: pip install --pre bqplot
 
     - name: Install bqplot-gl
-      run: pip install .
+      run: pip install . -vvv
 
     - name: Test installation files
       run: |
@@ -82,46 +53,10 @@ jobs:
       run: flake8 bqplot_gl --ignore=E501,W504,W503
 
     - name: JavaScript prettyfier
-      run: yarn run prettier:check
-
-    - name: JavaScript tests
-      run: yarn run test
-
-    - name: Install Galata
-      run: yarn install
-      working-directory: ui-tests
-
-    - name: Launch JupyterLab
-      run: yarn run start-jlab:detached
-      working-directory: ui-tests
-
-    - name: Wait for JupyterLab
-      uses: ifaxity/wait-on-action@v1
-      with:
-        resource: http-get://localhost:8888/api
-        timeout: 20000
-
-    - name: Run UI Tests
-      run: yarn run test
-      working-directory: ui-tests
-
-    - name: Upload UI Test artifacts
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: ui-test-output
-        path: ui-tests/test-output
+      run: jlpm run prettier:check
 
     - name: Build Python package
-      run: |
-        python setup.py sdist bdist_wheel
-        cd dist
-        sha256sum * | tee SHA256SUMS
-
-    - name: Pack JavaScript package
-      run: |
-        yarn pack
-        mv bqplot*.tgz ../dist
+      run: python -m build
 
     - name: Upload builds
       uses: actions/upload-artifact@v2
@@ -129,29 +64,23 @@ jobs:
         name: dist ${{ github.run_number }}
         path: ./dist
 
-  install:
-    runs-on: ${{ matrix.os }}-latest
+  visual-regression-tests:
+    runs-on: ubuntu-latest
     needs: [build]
 
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu, macos, windows]
-        python: ['3.9']
 
     steps:
 
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup conda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          activate-environment: bqplot-gl-test
+          environment-name: bqplot-gl-test
           environment-file: test-environment.yml
-          python-version: ${{ matrix.python-version }}
-          mamba-version: "*"
-          auto-activate-base: false
           channels: conda-forge
 
       - uses: actions/download-artifact@v2
@@ -164,17 +93,35 @@ jobs:
           cd dist
           pip install -vv bqplot*.whl
 
-      - name: Test installation files
-        run: |
-          test -d $CONDA_PREFIX/share/jupyter/nbextensions/bqplot-gl
-          test -f $CONDA_PREFIX/share/jupyter/nbextensions/bqplot-gl/extension.js
-          test -f $CONDA_PREFIX/share/jupyter/nbextensions/bqplot-gl/index.js
-          test -d $CONDA_PREFIX/share/jupyter/labextensions/bqplot-gl
-          test -f $CONDA_PREFIX/share/jupyter/labextensions/bqplot-gl/package.json
-          test -d $CONDA_PREFIX/share/jupyter/labextensions/bqplot-gl/static
+      - name: Install dependencies
+        shell: bash -l {0}
+        working-directory: ui-tests
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+        run: jlpm install
 
-      - name: Validate the nbextension
-        run: jupyter nbextension list 2>&1 | grep "bqplot-gl/extension"
+      - name: Set up browser cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/pw-browsers
+          key: ${{ runner.os }}-${{ hashFiles('ui-tests/yarn.lock') }}
 
-      - name: Validate the labextension
-        run: jupyter labextension list 2>&1 | grep bqplot-gl
+      - name: Install browser
+        shell: bash -l {0}
+        run: npx playwright install chromium
+        working-directory: ui-tests
+
+      - name: Execute integration tests
+        shell: bash -l {0}
+        working-directory: ui-tests
+        run: npx playwright test
+
+      - name: Upload Playwright Test report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: bqplot-playwright-tests
+          path: |
+            ui-tests/test-results
+            ui-tests/playwright-report

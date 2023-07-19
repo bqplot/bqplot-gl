@@ -74,16 +74,17 @@ export function initializeBqplotFigure(figure: Figure) {
 
     // Actual render function
     ext.webGLRender = function () {
-      const renderer = this.extras.webGLRenderer.renderer;
+      const fig = this as Figure;
+      const renderer = fig.extras.webGLRenderer.renderer;
 
-      this.extras.webGLRenderer.renderer.setPixelRatio(
-        this.model.get('pixel_ratio') || window.devicePixelRatio
+      fig.extras.webGLRenderer.renderer.setPixelRatio(
+        fig.model.get('pixel_ratio') || window.devicePixelRatio
       );
 
       resizeRenderer(
-        this.extras.webGLRenderer,
-        this.plotarea_width,
-        this.plotarea_height
+        fig.extras.webGLRenderer,
+        fig.plotareaWidth,
+        fig.plotareaHeight
       );
 
       // Clear renderer
@@ -92,7 +93,7 @@ export function initializeBqplotFigure(figure: Figure) {
       renderer.clear();
 
       // Render WebGL marks
-      const marks = this.extras.webGLMarks;
+      const marks = fig.extras.webGLMarks;
       for (const mark of marks) {
         mark.renderGL();
       }
@@ -100,14 +101,16 @@ export function initializeBqplotFigure(figure: Figure) {
 
     // Render request functions
     ext.webGLUpdate = function () {
-      this.extras.webGLRender();
-      this.extras.webGLUpdateRequested = false;
+      const fig = this as Figure;
+      fig.extras.webGLRender();
+      fig.extras.webGLUpdateRequested = false;
     }.bind(figure);
 
     ext.webGLRequestRender = function () {
-      if (!this.extras.webGLUpdateRequested) {
-        this.extras.webGLUpdateRequested = true;
-        requestAnimationFrame(this.extras.webGLUpdate);
+      const fig = this as Figure;
+      if (!fig.extras.webGLUpdateRequested) {
+        fig.extras.webGLUpdateRequested = true;
+        requestAnimationFrame(fig.extras.webGLUpdate);
       }
     }.bind(figure);
 

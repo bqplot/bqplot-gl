@@ -177,8 +177,8 @@ export class LinesGLView extends Lines {
     this.material.uniforms['range_x'].value = range_x;
     this.material.uniforms['range_y'].value = [range_y[1], range_y[0]];
     this.material.uniforms['resolution'].value = [
-      fig.plotarea_width,
-      fig.plotarea_height,
+      fig.plotareaWidth,
+      fig.plotareaHeight,
     ];
     this.updateMaterialScales();
 
