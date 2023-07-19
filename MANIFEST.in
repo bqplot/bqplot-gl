@@ -1,14 +1,16 @@
 include LICENSE
 include README.md
 
-include setupbase.py
 include pytest.ini
 include .coverage.rc
 
 include tsconfig.json
 include package.json
 include webpack.config.js
-include bqplot-gl/labextension/*.tgz
+include pyproject.toml
+include setup.py
+include setup.cfg
+include yarn.lock
 
 # Documentation
 graft docs
@@ -39,7 +41,3 @@ global-exclude *.pyc
 global-exclude *.pyo
 global-exclude .git
 global-exclude .ipynb_checkpoints
-
-include LICENSE
-include pyproject.toml
-include yarn.lock
