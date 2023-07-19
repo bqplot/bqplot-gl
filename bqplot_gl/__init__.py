@@ -5,7 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from .marks import *  # noqa
-from ._version import __version__, version_info  # noqa
+from ._version import __version__  # noqa
 
 
 def _jupyter_labextension_paths():
