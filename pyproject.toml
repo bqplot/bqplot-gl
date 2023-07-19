@@ -47,12 +47,12 @@ Homepage = "https://github.com/bqplot/bqplot-gl"
 
 [tool.hatch.build]
 artifacts = [
-    "bqplot_gl/nbextension/static/index.*",
+    "bqplot_gl/nbextension/index.*",
     "bqplot_gl/labextension",
 ]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"bqplot_gl/nbextension/static" = "share/jupyter/nbextensions/bqplot-gl"
+"bqplot_gl/nbextension" = "share/jupyter/nbextensions/bqplot-gl"
 "bqplot_gl/labextension" = "share/jupyter/labextensions/bqplot-gl"
 "bqplot-gl.json" = "etc/jupyter/nbconfig/notebook.d/bqplot-gl.json"
 
@@ -63,7 +63,7 @@ exclude = [
 
 [tool.hatch.build.hooks.jupyter-builder]
 ensured-targets = [
-    "bqplot_gl/nbextension/static/index.js",
+    "bqplot_gl/nbextension/index.js",
     "bqplot_gl/labextension/package.json",
 ]
 dependencies = [
