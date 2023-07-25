@@ -2,12 +2,10 @@
 
 Plugin to bqplot powered by WebGL.
 
-## Requirements
-
-You need bqplot 0.13
+## Installation
 
 ```bash
-pip install --pre bqplot
+pip install --pre bqplot-gl bqplot
 ```
 
 ## Usage
