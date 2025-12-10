@@ -21,12 +21,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install Conda environment with Micromamba
-      uses: mamba-org/provision-with-micromamba@main
+    - name: Setup conda
+      uses: mamba-org/setup-micromamba@main
       with:
-        environment-name: bqplot-gl-test
         environment-file: test-environment.yml
-        channels: conda-forge
 
     - name: Install bqplot
       run: pip install --pre bqplot
@@ -76,12 +74,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
+      - name: Setup conda
+        uses: mamba-org/setup-micromamba@main
         with:
-          environment-name: bqplot-gl-test
           environment-file: test-environment.yml
-          channels: conda-forge
 
       - uses: actions/download-artifact@v4
         with:
