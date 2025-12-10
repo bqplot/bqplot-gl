@@ -58,6 +58,7 @@ source = "nodejs"
 artifacts = [
     "bqplot_gl/nbextension/index.*",
     "bqplot_gl/labextension",
+    "bqscales/_version.py",
 ]
 
 [tool.hatch.build.targets.wheel.shared-data]
