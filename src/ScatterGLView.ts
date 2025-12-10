@@ -654,7 +654,8 @@ export class ScatterGLView extends Mark {
     animate = true,
     after_animation: Function = () => {}
   ) {
-    if (animate) {
+    const animation_duration = this.parent.model.get('animation_duration');
+    if (animate && animation_duration > 0) {
       // `value_previous.array` must have at least the same length as `value.array` in order for animation to work
       if (
         value.array.length < new_parameters.array.length &&
@@ -722,11 +723,30 @@ export class ScatterGLView extends Mark {
     this.material.uniforms['animation_time_' + name]['value'] = 0;
     const set = (value) => {
       this.material.uniforms['animation_time_' + name]['value'] = value;
+
+      if (value == 1) {
+        const updater =
+          {
+            x: this.updateX,
+            y: this.updateY,
+            size: this.updateSize,
+            opacity: this.updateOpacity,
+          }[name] || null;
+        if (updater !== null) {
+          // we update once without animation, otherwise we might
+          // have dynamic range issues https://github.com/bqplot/bqplot/issues/1661
+          // when the previous values are in a completely different d3-domain
+          // the issue resides in vec3 center = mix(vec3(x_previous, y_previous, 0), vec3(x, y, 0), animation_time);
+          // in scatter-vertex.glsl where x/y_previous is of a different magnitude, which somehow affects
+          // the precision in center, causing aliasing (on some hardware)
+          updater.apply(this, [true, false]);
+        }
+      }
     };
     this.transition(set, after_animation, this);
   }
 
-  updateX(rerender = true) {
+  updateX(rerender = true, animate: boolean = true) {
     const x_array = to_float_array(this.model.get('x'));
 
     const new_markers_number = Math.min(x_array.length, this.y.array.length);
@@ -740,7 +760,8 @@ export class ScatterGLView extends Mark {
       'x',
       this.x,
       this.x_previous,
-      new AttributeParameters(x_array, 1, 1)
+      new AttributeParameters(x_array, 1, 1),
+      animate
     );
 
     if (rerender) {
@@ -748,7 +769,7 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  updateY(rerender = true) {
+  updateY(rerender = true, animate: boolean = true) {
     const y_array = to_float_array(this.model.get('y'));
 
     const new_markers_number = Math.min(this.x.array.length, y_array.length);
@@ -762,7 +783,8 @@ export class ScatterGLView extends Mark {
       'y',
       this.y,
       this.y_previous,
-      new AttributeParameters(y_array, 1, 1)
+      new AttributeParameters(y_array, 1, 1),
+      animate
     );
 
     if (rerender) {
@@ -803,13 +825,14 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  updateOpacity(rerender = true) {
+  updateOpacity(rerender = true, animate: boolean = true) {
     const opacity_parameters = this.getOpacityAttributeParameters();
     [this.opacity, this.opacity_previous] = this.updateAttributes(
       'opacity',
       this.opacity,
       this.opacity_previous,
-      opacity_parameters
+      opacity_parameters,
+      animate
     );
 
     if (rerender) {
@@ -817,13 +840,14 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  updateSize(rerender = true) {
+  updateSize(rerender = true, animate: boolean = true) {
     const size_parameters = this.getSizeAttributeParameters();
     [this.size, this.size_previous] = this.updateAttributes(
       'size',
       this.size,
       this.size_previous,
-      size_parameters
+      size_parameters,
+      animate
     );
 
     if (rerender) {
@@ -831,13 +855,14 @@ export class ScatterGLView extends Mark {
     }
   }
 
-  updateRotation(rerender = true) {
+  updateRotation(rerender = true, animate: boolean = true) {
     const rotation_parameters = this.getRotationAttributeParameters();
     [this.rotation, this.rotation_previous] = this.updateAttributes(
       'rotation',
       this.rotation,
       this.rotation_previous,
-      rotation_parameters
+      rotation_parameters,
+      animate
     );
 
     if (rerender) {
