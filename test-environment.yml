@@ -3,8 +3,8 @@ channels:
     - conda-forge
 dependencies:
     - pip
-    - python=3.11
-    - build
+    - python
+    - python-build
     - yarn
     - ipywidgets
     - traitlets
@@ -14,7 +14,7 @@ dependencies:
     - bqscales>=0.3.2
     - scipy
     - notebook
-    - jupyterlab=4  # to build the lab federated bundle
+    - jupyterlab
     - jupyter-packaging # to build the wheel
     - pytest
     - nbval
