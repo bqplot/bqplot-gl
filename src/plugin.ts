@@ -11,7 +11,7 @@ import * as widgetExports from './index';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
-const EXTENSION_ID = 'bqplot-gl:plugin';
+const EXTENSION_ID = `@bqplot/bqplot-gl:plugin${MODULE_VERSION}`;
 
 /**
  * The bqlotGL plugin.
