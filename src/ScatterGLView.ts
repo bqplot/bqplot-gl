@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { ColorScale } from 'bqscales';
+import type { ColorScale } from 'bqscales';
 import { Mark, symbol as bqSymbol, deepCopy, Scale } from 'bqplot';
 import * as d3 from 'd3';
 import * as _ from 'underscore';

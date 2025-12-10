@@ -15,17 +15,25 @@ defaults:
 jobs:
   update-reference-screenshots:
     name: Update Galata References
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, 'update galata references') }}
+    if: >
+      (
+        github.event.issue.author_association == 'OWNER' ||
+        github.event.issue.author_association == 'COLLABORATOR' ||
+        github.event.issue.author_association == 'MEMBER'
+      ) && github.event.issue.pull_request && contains(github.event.comment.body, 'please update snapshots')
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git to use https
         run: git config --global hub.protocol https
+
+      - name: Install hub
+        run: sudo apt-get update && sudo apt-get install -y hub
 
       - name: Checkout the branch from the PR that triggered the job
         run: hub pr checkout ${{ github.event.issue.number }}
@@ -33,9 +41,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
+        uses: mamba-org/setup-micromamba@main
         with:
-          environment-name: bqplot-test
           environment-file: test-environment.yml
           channels: conda-forge
 

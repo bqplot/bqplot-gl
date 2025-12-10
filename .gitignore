@@ -158,3 +158,5 @@ bqplot_gl/labextension
 ui-tests/test-output/*
 ui-tests/test-results/*
 ui-tests/playwright-report/*
+
+.yarn
