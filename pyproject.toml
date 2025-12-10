@@ -1,6 +1,9 @@
 [build-system]
 requires = [
+    "hatch",
     "hatchling",
+    "hatch-nodejs-version",
+    "hatch-build-scripts",
     "jupyterlab==4.*",
 ]
 build-backend = "hatchling.build"
@@ -28,22 +31,28 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "bqplot>=0.13.0a0,<0.14",
 ]
-version = "0.1.0a0"
+dynamic = [
+    "version",
+]
 
 [project.license]
 file = "LICENSE"
 
 [project.urls]
 Homepage = "https://github.com/bqplot/bqplot-gl"
+
+[tool.hatch.version]
+source = "nodejs"
 
 [tool.hatch.build]
 artifacts = [
@@ -70,6 +79,13 @@ dependencies = [
     "hatch-jupyter-builder>=0.8.1",
 ]
 build-function = "hatch_jupyter_builder.npm_builder"
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+work_dir = "."
+commands = ['python scripts/write_version.py']
+artifacts = [
+    "bqplot_gl/_version.py"
+]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "."
