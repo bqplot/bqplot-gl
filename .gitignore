@@ -160,3 +160,5 @@ ui-tests/test-results/*
 ui-tests/playwright-report/*
 
 .yarn
+
+bqplot_gl/_version.py
