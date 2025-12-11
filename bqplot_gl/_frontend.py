@@ -8,5 +8,9 @@
 Information about the frontend package of the widgets.
 """
 
+from ._version import __version__
+
+major, minor, *_ = __version__.split('.')
+
 module_name = "bqplot-gl"
-module_version = "^0.1.0-alpha.0"
+module_version = f"^{major}.{minor}.0-0"
