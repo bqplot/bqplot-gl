@@ -281,13 +281,15 @@ export class ScatterGLView extends Mark {
     this.material.defines['USE_SCALE_X'] = true;
     this.material.defines['USE_SCALE_Y'] = true;
 
-    const scaleTypeMap = { date: ScaleType.SCALE_TYPE_LINEAR, linear: ScaleType.SCALE_TYPE_LINEAR, log: ScaleType.SCALE_TYPE_LOG };
+    const scaleTypeMap = {
+      date: ScaleType.SCALE_TYPE_LINEAR,
+      linear: ScaleType.SCALE_TYPE_LINEAR,
+      log: ScaleType.SCALE_TYPE_LOG,
+    };
     const x_scale = this.scales.x ? this.scales.x : this.parent.scale_x;
     const y_scale = this.scales.y ? this.scales.y : this.parent.scale_y;
-    this.material.defines[`SCALE_TYPE_X`] =
-      scaleTypeMap[x_scale.model.type];
-    this.material.defines[`SCALE_TYPE_Y`] =
-      scaleTypeMap[y_scale.model.type];
+    this.material.defines[`SCALE_TYPE_X`] = scaleTypeMap[x_scale.model.type];
+    this.material.defines[`SCALE_TYPE_Y`] = scaleTypeMap[y_scale.model.type];
 
     const opacity_parameters = this.getOpacityAttributeParameters();
     this.opacity = this.initializeAttribute('opacity', opacity_parameters);
