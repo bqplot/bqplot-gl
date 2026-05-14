@@ -147,7 +147,10 @@ jobs:
 
       - name: Keep only PyPI artifacts
         run: |
-          rm -f dist/*.tgz
+          mkdir pypi-dist
+          mv dist/*.whl dist/*.tar.gz pypi-dist/
+          rm -rf dist
+          mv pypi-dist dist
           ls -la dist/
 
       - name: Verify tag matches wheel version
